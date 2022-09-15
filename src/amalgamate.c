@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main(int argc, char const* argv[]) {
@@ -19,31 +20,27 @@ int main(int argc, char const* argv[]) {
         return 1;
     }
 
+    static const int bufsize = 16*1024;
+    char* buffer = malloc(bufsize);
+
     for (int i = 0; i < nFilenames; ++i) {
         FILE* fp = fopen(aFilenames[i], "rb");
         if (!fp) {
             fprintf(stderr, "error opening %s: %s\n", aFilenames[i], strerror(errno));
             return 1;
         }
-        char buffer[512];
-        size_t nread =
-            snprintf(buffer, sizeof(buffer), "\n/********** %s **********/\n\n", aFilenames[i]);
-        if (fwrite(buffer, 1, nread, fout) != nread) {
+        snprintf(buffer, bufsize, "\n/********** %s **********/\n\n", aFilenames[i]);
+        if (fwrite(buffer, 1, strlen(buffer), fout) != strlen(buffer)) {
             fprintf(stderr, "error writing http.c: %s\n", strerror(errno));
             return 1;
         }
-        while (1) {
-            nread = fread(buffer, 1, sizeof(buffer), fp);
-            if (!nread) {
-                if (ferror(fp)) {
-                    fprintf(stderr, "error reading %s: %s\n", aFilenames[i], strerror(errno));
+        while (fgets(buffer, bufsize, fp)) {
+            size_t l = strlen(buffer);
+            if (strncmp(buffer, "#include \"http.h\"", 17) != 0) {
+                if (fwrite(buffer, 1, l, fout) != l) {
+                    fprintf(stderr, "error writing http.c: %s\n", strerror(errno));
                     return 1;
                 }
-                break;
-            }
-            if (fwrite(buffer, 1, nread, fout) != nread) {
-                fprintf(stderr, "error writing http.c: %s\n", strerror(errno));
-                return 1;
             }
         }
         fclose(fp);

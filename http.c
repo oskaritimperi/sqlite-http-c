@@ -70,7 +70,6 @@ void separate_status_and_headers(char** ppStatus, char* zHeaders);
 
 /********** src/http.c **********/
 
-#include "http.h"
 
 SQLITE_EXTENSION_INIT1
 
@@ -866,7 +865,6 @@ __declspec(dllexport)
 
 #ifdef HTTP_BACKEND_CURL
 
-#include "http.h"
 
 #include <assert.h>
 #include <string.h>
@@ -1347,7 +1345,6 @@ done:
 
 #ifdef HTTP_BACKEND_DUMMY
 
-#include "http.h"
 
 #include <assert.h>
 
@@ -1412,7 +1409,6 @@ int http_do_request(http_request* req, http_response* resp, char** ppErrMsg) {
 
 #ifdef HTTP_BACKEND_WINHTTP
 
-#include "http.h"
 
 #include <windows.h>
 #include <winhttp.h>
