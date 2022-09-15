@@ -893,7 +893,7 @@ void* http_dlopen(const char* zName) {
 }
 
 void http_dlclose(void* library) {
-    dlclose(zName);
+    dlclose(library);
 }
 
 void* http_dlsym(void* library, const char* zName) {
